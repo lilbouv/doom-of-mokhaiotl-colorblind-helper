@@ -10,7 +10,9 @@ public interface DoomColorBlindConfig extends Config
 	enum ProjectileTheme
 	{
 		INFERNO,
-		TOA
+		TOA,
+		OLM,
+		LEVIATHAN
 	}
 
 	@ConfigItem(
@@ -20,6 +22,16 @@ public interface DoomColorBlindConfig extends Config
 	)
 	default ProjectileTheme projectileTheme()
 	{
-		return ProjectileTheme.INFERNO;
+		return ProjectileTheme.TOA;
+	}
+
+	@ConfigItem(
+			keyName = "replaceMelee",
+			name = "Replace Melee Projectiles",
+			description = "Toggle whether melee projectile animations are replaced (Inferno doesn't regardless)"
+	)
+	default boolean replaceMelee()
+	{
+		return false;
 	}
 }
