@@ -29,6 +29,7 @@ public class DoomColorBlindPlugin extends Plugin
 	{
 		return configManager.getConfig(DoomColorBlindConfig.class);
 	}
+
 	@Subscribe
 	public void onProjectileMoved(ProjectileMoved event)
 	{
@@ -39,24 +40,57 @@ public class DoomColorBlindPlugin extends Plugin
 
 		switch (id)
 		{
+			//
 			case 3380: // Doom range
-				if(config.projectileTheme() == DoomColorBlindConfig.ProjectileTheme.INFERNO)
+				switch(config.projectileTheme())
 				{
-					replacementId = 1378;
-				}
-				else
-				{
-					replacementId = 2241;
+					case TOA:
+						replacementId = 2241;
+						break;
+					case INFERNO:
+						replacementId = 1378;
+						break;
+					case OLM:
+						replacementId = 1343;
+						break;
+					case LEVIATHAN:
+						replacementId = 2487;
+						break;
 				}
 				break;
 
 			case 3379: // Doom magic
-				if(config.projectileTheme() == DoomColorBlindConfig.ProjectileTheme.INFERNO) {
-					replacementId = 1380; // Inferno mage
-				}
-				else
+				switch(config.projectileTheme())
 				{
-					replacementId = 2224;
+					case TOA:
+						replacementId = 2224;
+						break;
+					case INFERNO:
+						replacementId = 1380;
+						break;
+					case OLM:
+						replacementId = 1341;
+						break;
+					case LEVIATHAN:
+						replacementId = 2489;
+						break;
+				}
+				break;
+			case 3378: // Doom melee
+				if (!config.replaceMelee())
+					break;
+				switch(config.projectileTheme())
+				{
+					case TOA:
+						replacementId = 2204;
+						break;
+					case OLM:
+						replacementId = 1345;
+						break;
+					case LEVIATHAN:
+						replacementId = 2488;
+						break;
+					// No Inferno Melee
 				}
 				break;
 		}
