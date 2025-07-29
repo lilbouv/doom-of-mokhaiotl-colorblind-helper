@@ -12,38 +12,34 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
 @Slf4j
-@PluginDescriptor(
-		name = "Doom Colorblind Helper",
-		description = "Replaces Doom projectiles with Inferno blob colors for better visibility",
-		tags = {"doom", "colorblind", "projectile"}
-)
-public class DoomColorBlindPlugin extends Plugin
-{
+@PluginDescriptor(name = "Doom Colorblind Helper", description = "Replaces Doom projectiles with Inferno blob colors for better visibility", tags = {
+		"doom", "colorblind", "projectile" })
+public class DoomColorBlindPlugin extends Plugin {
 	@Inject
 	private Client client;
 	@Inject
 	private DoomColorBlindConfig config;
 
 	@Provides
-	DoomColorBlindConfig provideConfig(ConfigManager configManager)
-	{
+	DoomColorBlindConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(DoomColorBlindConfig.class);
 	}
 
 	@Subscribe
-	public void onProjectileMoved(ProjectileMoved event)
-	{
+	public void onProjectileMoved(ProjectileMoved event) {
 		Projectile proj = event.getProjectile();
 		int id = proj.getId();
 
 		int replacementId = -1;
 
-		switch (id)
-		{
-			//
+		final int RANGE_ROCK_PROJECTILE = 3384;
+		final int MAGE_ROCK_PROJECTILE = 3385;
+		final int ZEBAK_RANGE_PROJECTILE = 2178;
+		final int ZEBAK_MAGE_PROJECTILE = 2176;
+
+		switch (id) {
 			case 3380: // Doom range
-				switch(config.projectileTheme())
-				{
+				switch (config.projectileTheme()) {
 					case TOA:
 						replacementId = 2241;
 						break;
@@ -60,8 +56,7 @@ public class DoomColorBlindPlugin extends Plugin
 				break;
 
 			case 3379: // Doom magic
-				switch(config.projectileTheme())
-				{
+				switch (config.projectileTheme()) {
 					case TOA:
 						replacementId = 2224;
 						break;
@@ -79,8 +74,7 @@ public class DoomColorBlindPlugin extends Plugin
 			case 3378: // Doom melee
 				if (!config.replaceMelee())
 					break;
-				switch(config.projectileTheme())
-				{
+				switch (config.projectileTheme()) {
 					case TOA:
 						replacementId = 2204;
 						break;
@@ -93,6 +87,15 @@ public class DoomColorBlindPlugin extends Plugin
 					// No Inferno Melee
 				}
 				break;
+			case RANGE_ROCK_PROJECTILE:
+				if (config.toathemedRock()) {
+					replacementId = ZEBAK_RANGE_PROJECTILE; // Zebak themed rock
+				}
+				break;
+			case MAGE_ROCK_PROJECTILE:
+				if (config.toathemedRock()) {
+					replacementId = ZEBAK_MAGE_PROJECTILE; // Zebak themed rock
+				}
 		}
 
 		if (replacementId == -1)
@@ -107,8 +110,7 @@ public class DoomColorBlindPlugin extends Plugin
 				proj.getTargetPoint(),
 				proj.getEndHeight(), proj.getTargetActor(),
 				proj.getStartCycle(), proj.getEndCycle(),
-				proj.getSlope(), proj.getStartPos()
-		);
+				proj.getSlope(), proj.getStartPos());
 
 		client.getProjectiles().addLast(replacement);
 		proj.setEndCycle(0); // Hide original
