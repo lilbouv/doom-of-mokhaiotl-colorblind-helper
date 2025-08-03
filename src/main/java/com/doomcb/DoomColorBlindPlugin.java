@@ -38,8 +38,14 @@ public class DoomColorBlindPlugin extends Plugin
 
 		int replacementId = -1;
 
+		final int RANGE_ROCK_PROJECTILE = 3384;
+		final int MAGE_ROCK_PROJECTILE = 3385;
+		final int ZEBAK_RANGE_PROJECTILE = 2178;
+		final int ZEBAK_MAGE_PROJECTILE = 2176;
+
 		switch (id)
 		{
+
 			//
 			case 3380: // Doom range
 				switch(config.projectileTheme())
@@ -91,6 +97,16 @@ public class DoomColorBlindPlugin extends Plugin
 						replacementId = 2488;
 						break;
 					// No Inferno Melee
+				}
+				break;
+			case RANGE_ROCK_PROJECTILE:
+				if (config.toathemedRock()) {
+					replacementId = ZEBAK_RANGE_PROJECTILE;
+				}
+				break;
+			case MAGE_ROCK_PROJECTILE:
+				if (config.toathemedRock()) {
+					replacementId = ZEBAK_MAGE_PROJECTILE;
 				}
 				break;
 		}

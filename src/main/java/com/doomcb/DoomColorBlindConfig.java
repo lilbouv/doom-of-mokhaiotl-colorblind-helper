@@ -34,4 +34,13 @@ public interface DoomColorBlindConfig extends Config
 	{
 		return false;
 	}
+
+	@ConfigItem(
+			name = "ToA Themed Boulder",
+			keyName = "themedRock",
+			description = "Replace boulders with Zebak alternatives")
+	default boolean toathemedRock() {
+		return false;
+	}
+
 }
