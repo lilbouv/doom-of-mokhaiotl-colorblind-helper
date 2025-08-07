@@ -5,9 +5,12 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Projectile;
+import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.ProjectileMoved;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
@@ -22,12 +25,33 @@ public class DoomColorBlindPlugin extends Plugin
 	@Inject
 	private Client client;
 	@Inject
+	private ClientThread clientThread;
+	@Inject
 	private DoomColorBlindConfig config;
 
 	@Provides
 	DoomColorBlindConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(DoomColorBlindConfig.class);
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (!event.getGroup().equals("doomcolorblind"))
+		{
+			return;
+		}
+
+		switch (event.getKey())
+		{
+			case DoomColorBlindConfig.CONFIG_KEY_LOOT_SOUND_ENABLED:
+			case DoomColorBlindConfig.CONFIG_KEY_LOOT_SOUND_ID:
+				clientThread.invokeLater(this::playLootSound);
+				break;
+			default:
+				break;
+		}
 	}
 
 	@Subscribe
@@ -128,5 +152,33 @@ public class DoomColorBlindPlugin extends Plugin
 
 		client.getProjectiles().addLast(replacement);
 		proj.setEndCycle(0); // Hide original
+	}
+
+	@Subscribe
+	public void onGameObjectSpawned(GameObjectSpawned event)
+	{
+		if (event.getGameObject().getId() == 50940) // Burrow Hole (Unique)
+		{
+			playLootSound();
+		}
+	}
+
+	private void playLootSound()
+	{
+		if (!config.lootSoundEnabled())
+		{
+			return;
+		}
+
+		var effectVolume = config.lootSoundVolume();
+		if (effectVolume <= 0)
+		{
+			return;
+		}
+
+		var userVolume = client.getPreferences().getSoundEffectVolume();
+		client.getPreferences().setSoundEffectVolume(effectVolume);
+		client.playSoundEffect(config.lootSoundId(), effectVolume);
+		client.getPreferences().setSoundEffectVolume(userVolume);
 	}
 }
